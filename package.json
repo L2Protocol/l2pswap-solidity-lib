@@ -1,22 +1,33 @@
 {
-  "name": "@uniswap/lib",
-  "version": "4.0.1-alpha",
-  "description": "📖 Solidity libraries that are shared across Uniswap contracts",
+  "name": "@l2pswap/lib",
+  "version": "1.0.0",
+  "description": "Solidity libraries that are shared across L2PSwap contracts",
   "files": [
     "contracts",
     "!contracts/test"
   ],
-  "homepage": "https://uniswap.org",
-  "repository": {
-    "url": "https://github.com/Uniswap/uniswap-lib",
-    "type": "git"
+  "homepage": "https://l2protocol.com",
+  "author": "L2Protocol",  
+  "repository": {    
+    "type": "git",
+    "url": "git+https://github.com/L2Protocol/l2pswap-solidity-lib.git"
   },
   "bugs": {
-    "url": "https://github.com/Uniswap/uniswap-lib/issues"
+    "url": "https://github.com/L2Protocol/l2pswap-solidity-lib/issues"
   },
+  "keywords": [
+    "l2pswap",
+    "ethereum",
+    "l2protocol",
+    "lib",
+    "l2p"
+  ],
   "engines": {
     "node": ">=10"
   },
+  "publishConfig": {
+    "access": "public"
+  },  
   "devDependencies": {
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
