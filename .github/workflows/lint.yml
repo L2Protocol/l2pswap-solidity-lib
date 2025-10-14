@@ -4,29 +4,57 @@ on:
   push:
     branches:
       - master
-  pull_request_target:
+  pull_request:
 
 jobs:
   run-linters:
     name: Run linters
     runs-on: ubuntu-latest
+    # Needed so the action can commit and push when auto_fix is true (on push events)
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Set up node
-        uses: actions/setup-node@v1
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 12
+          node-version: '12.x'
+
+      - name: Set up Python (for node-gyp during yarn)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Cache Yarn dependencies
+        id: yarn-cache-dir
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.yarn-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Configure npm to use Python 3.10 (for node-gyp)
+        run: npm config set python "python3.10"
 
       - name: Install dependencies
-        run: yarn
+        run: yarn install --frozen-lockfile
+        env:
+          PYTHON: python3.10
 
       - name: Run linters
-        uses: wearerequired/lint-action@feature/pull_request_target
+        uses: wearerequired/lint-action@v2
         with:
-          github_token: ${{ secrets.github_token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           prettier: true
-          auto_fix: true
+          # Only allow auto-fix to commit on push events (never on PRs/forks)
+          auto_fix: ${{ github.event_name == 'push' }}
           prettier_extensions: 'css,html,js,json,jsx,md,sass,scss,ts,tsx,vue,yaml,yml,sol'
